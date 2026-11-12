@@ -1,0 +1,1118 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bảng Tuần Hoàn Hóa Học Thông Minh</title>
+    <!-- Google Fonts hỗ trợ tiếng Việt mượt mà, nét tròn dễ thương -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@500;700;800;900&family=Quicksand:wght@600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            /* 6 nhóm màu Pastel theo yêu cầu */
+            --cat-metal-bg: #FFD6E0;
+            --cat-metal-border: #FF8FAB;
+            --cat-metal-text: #800F2F;
+
+            --cat-transition-bg: #FFE8CC;
+            --cat-transition-border: #FFB703;
+            --cat-transition-text: #7F4F24;
+
+            --cat-nonmetal-bg: #D8F3DC;
+            --cat-nonmetal-border: #52B788;
+            --cat-nonmetal-text: #1B4332;
+
+            --cat-noble-bg: #D0EBFF;
+            --cat-noble-border: #4CC9F0;
+            --cat-noble-text: #023E8A;
+
+            --cat-lanthanide-bg: #E5D4EF;
+            --cat-lanthanide-border: #B5179E;
+            --cat-lanthanide-text: #4A148C;
+
+            --cat-actinide-bg: #FFF3B0;
+            --cat-actinide-border: #E09F3E;
+            --cat-actinide-text: #540B0E;
+        }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background: linear-gradient(135deg, #FFF5F7 0%, #F0F7FF 50%, #F3FFF8 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+            color: #334155;
+        }
+
+        h1, h2, h3, .font-title {
+            font-family: 'Quicksand', sans-serif;
+        }
+
+        /* Hiệu ứng bong bóng bay nền */
+        .bubble {
+            position: fixed;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.9), rgba(255, 182, 193, 0.3));
+            box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.8);
+            pointer-events: none;
+            z-index: 0;
+            animation: floatUp linear infinite;
+        }
+
+        @keyframes floatUp {
+            0% {
+                transform: translateY(110vh) scale(0.8);
+                opacity: 0;
+            }
+            20% {
+                opacity: 0.7;
+            }
+            80% {
+                opacity: 0.7;
+            }
+            100% {
+                transform: translateY(-10vh) scale(1.1);
+                opacity: 0;
+            }
+        }
+
+        /* Animation cho nhân vật mèo khoa học 2D */
+        @keyframes catBounce {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-8px) rotate(1.5deg); }
+        }
+        @keyframes catWave {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(-18deg); }
+            75% { transform: rotate(12deg); }
+        }
+        @keyframes flaskBubble {
+            0%, 100% { transform: translateY(0) scale(1); opacity: 0.8; }
+            50% { transform: translateY(-10px) scale(1.3); opacity: 0; }
+        }
+        .cat-float {
+            animation: catBounce 3s ease-in-out infinite;
+        }
+        .cat-paw-wave {
+            transform-origin: 145px 135px;
+            animation: catWave 1.4s ease-in-out infinite;
+        }
+        .flask-dot {
+            animation: flaskBubble 2s ease-in-out infinite;
+        }
+
+        /* Nút PLAY nảy dễ thương */
+        .btn-play {
+            background: linear-gradient(180deg, #FF758F 0%, #FF4D6D 100%);
+            box-shadow: 0 8px 0 #C9184A, 0 15px 25px rgba(255, 77, 109, 0.4);
+            transition: all 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .btn-play:hover {
+            transform: translateY(-3px) scale(1.04);
+            box-shadow: 0 11px 0 #C9184A, 0 20px 30px rgba(255, 77, 109, 0.5);
+        }
+        .btn-play:active {
+            transform: translateY(5px) scale(0.98);
+            box-shadow: 0 3px 0 #C9184A, 0 6px 12px rgba(255, 77, 109, 0.3);
+        }
+
+        /* Lưới bảng tuần hoàn chuẩn 18 cột */
+        .ptable-grid {
+            display: grid;
+            grid-template-columns: repeat(18, minmax(46px, 1fr));
+            gap: 6px;
+            min-width: 920px;
+        }
+
+        /* Ô nguyên tố hình viên kẹo bo tròn */
+        .el-cell {
+            aspect-ratio: 1 / 1;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            font-size: 1.05rem;
+            cursor: pointer;
+            user-select: none;
+            position: relative;
+            transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+            border-width: 2.5px;
+            border-style: solid;
+        }
+        .el-cell::after {
+            content: '';
+            position: absolute;
+            top: 4px;
+            left: 6px;
+            right: 6px;
+            height: 30%;
+            border-radius: 10px;
+            background: linear-gradient(180deg, rgba(255,255,255,0.65) 0%, rgba(255,255,255,0) 100%);
+            pointer-events: none;
+        }
+        .el-cell:hover {
+            transform: translateY(-4px) scale(1.14);
+            z-index: 20;
+        }
+        .el-cell:active {
+            transform: translateY(1px) scale(0.96);
+        }
+
+        /* 6 màu phân loại */
+        .type-metal {
+            background-color: var(--cat-metal-bg);
+            border-color: var(--cat-metal-border);
+            color: var(--cat-metal-text);
+            box-shadow: 0 4px 0 var(--cat-metal-border);
+        }
+        .type-transition {
+            background-color: var(--cat-transition-bg);
+            border-color: var(--cat-transition-border);
+            color: var(--cat-transition-text);
+            box-shadow: 0 4px 0 var(--cat-transition-border);
+        }
+        .type-nonmetal {
+            background-color: var(--cat-nonmetal-bg);
+            border-color: var(--cat-nonmetal-border);
+            color: var(--cat-nonmetal-text);
+            box-shadow: 0 4px 0 var(--cat-nonmetal-border);
+        }
+        .type-noble {
+            background-color: var(--cat-noble-bg);
+            border-color: var(--cat-noble-border);
+            color: var(--cat-noble-text);
+            box-shadow: 0 4px 0 var(--cat-noble-border);
+        }
+        .type-lanthanide {
+            background-color: var(--cat-lanthanide-bg);
+            border-color: var(--cat-lanthanide-border);
+            color: var(--cat-lanthanide-text);
+            box-shadow: 0 4px 0 var(--cat-lanthanide-border);
+        }
+        .type-actinide {
+            background-color: var(--cat-actinide-bg);
+            border-color: var(--cat-actinide-border);
+            color: var(--cat-actinide-text);
+            box-shadow: 0 4px 0 var(--cat-actinide-border);
+        }
+
+        /* Làm mờ các ô không thuộc bộ lọc / tìm kiếm */
+        .el-dimmed {
+            opacity: 0.22;
+            transform: scale(0.93);
+            filter: grayscale(40%);
+        }
+        .el-highlight {
+            animation: pulseRing 1.2s infinite;
+            z-index: 15;
+        }
+        @keyframes pulseRing {
+            0% { box-shadow: 0 0 0 0 rgba(255, 77, 109, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(255, 77, 109, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 77, 109, 0); }
+        }
+
+        /* Hiệu ứng xuất hiện Modal */
+        @keyframes modalPop {
+            0% { opacity: 0; transform: scale(0.8) translateY(20px); }
+            100% { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        .modal-animate {
+            animation: modalPop 0.28s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+
+        /* Custom scrollbar cho bảng trên màn hình nhỏ */
+        .table-scroll::-webkit-scrollbar {
+            height: 10px;
+        }
+        .table-scroll::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.6);
+            border-radius: 999px;
+        }
+        .table-scroll::-webkit-scrollbar-thumb {
+            background: #FFB3C6;
+            border-radius: 999px;
+        }
+        .table-scroll::-webkit-scrollbar-thumb:hover {
+            background: #FF8FAB;
+        }
+    </style>
+</head>
+<body class="relative selection:bg-pink-200 selection:text-pink-900">
+
+    <!-- Container bong bóng bay nền -->
+    <div id="bubbles-container" class="fixed inset-0 pointer-events-none overflow-hidden z-0"></div>
+
+    <!-- =====================================================================
+         1. MÀN HÌNH CHÀO (LANDING SCREEN)
+    ====================================================================== -->
+    <section id="landing-screen" class="relative z-10 min-h-screen flex flex-col items-center justify-center px-4 py-8 text-center transition-all duration-500">
+        <div class="max-w-2xl w-full bg-white/80 backdrop-blur-md rounded-[2.5rem] p-8 sm:p-12 shadow-[0_20px_50px_rgba(255,143,171,0.25)] border-4 border-white flex flex-col items-center">
+            
+            <!-- Huy hiệu nhỏ xinh phía trên -->
+            <span class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-pink-100 text-pink-600 font-extrabold text-xs sm:text-sm tracking-wide mb-4 shadow-sm">
+                ✨ KHÁM PHÁ 118 NGUYÊN TỐ KỲ THÚ ✨
+            </span>
+
+            <!-- Nhân vật Mascot 2D: Mèo con nhà khoa học vẫy tay chào -->
+            <div class="w-44 h-44 sm:w-52 sm:h-52 mb-2 cat-float">
+                <svg viewBox="0 0 200 200" class="w-full h-full drop-shadow-md" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Hào quang pastel sau lưng mèo -->
+                    <circle cx="100" cy="105" r="78" fill="#FFE5EC" />
+                    <circle cx="100" cy="105" r="64" fill="#FFF0F3" />
+                    
+                    <!-- Đuôi mèo -->
+                    <path d="M52 152 C25 145, 22 115, 40 112 C50 110, 52 125, 45 132" fill="none" stroke="#FFB703" stroke-width="11" stroke-linecap="round"/>
+
+                    <!-- Áo choàng phòng thí nghiệm trắng -->
+                    <path d="M62 128 C58 165, 55 182, 55 182 L145 182 C145 182, 142 165, 138 128 Z" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="3"/>
+                    <!-- Cổ áo blouse -->
+                    <path d="M82 126 L100 148 L118 126" fill="#E0F2FE" stroke="#94A3B8" stroke-width="2.5" stroke-linejoin="round"/>
+                    <!-- Cà vạt nơ hồng -->
+                    <polygon points="100,136 91,130 91,142" fill="#FF4D6D"/>
+                    <polygon points="100,136 109,130 109,142" fill="#FF4D6D"/>
+                    <circle cx="100" cy="136" r="3.5" fill="#C9184A"/>
+
+                    <!-- Tai mèo trái & phải -->
+                    <polygon points="56,78 48,35 84,56" fill="#FFD166" stroke="#F4A261" stroke-width="3" stroke-linejoin="round"/>
+                    <polygon points="60,72 55,46 77,59" fill="#FF8FAB"/>
+                    <polygon points="144,78 152,35 116,56" fill="#FFD166" stroke="#F4A261" stroke-width="3" stroke-linejoin="round"/>
+                    <polygon points="140,72 145,46 123,59" fill="#FF8FAB"/>
+
+                    <!-- Đầu mèo -->
+                    <ellipse cx="100" cy="92" rx="48" ry="40" fill="#FFE8A3" stroke="#F4A261" stroke-width="3"/>
+                    <!-- Vệt lông cam trên trán -->
+                    <path d="M92 53 L100 66 L108 53" fill="#F4A261"/>
+                    <path d="M82 56 L88 65" stroke="#F4A261" stroke-width="3" stroke-linecap="round"/>
+                    <path d="M118 56 L112 65" stroke="#F4A261" stroke-width="3" stroke-linecap="round"/>
+
+                    <!-- Kính bảo hộ khoa học đeo trên trán -->
+                    <rect x="62" y="58" width="32" height="20" rx="8" fill="#E0F7FA" fill-opacity="0.85" stroke="#00B4D8" stroke-width="3"/>
+                    <rect x="106" y="58" width="32" height="20" rx="8" fill="#E0F7FA" fill-opacity="0.85" stroke="#00B4D8" stroke-width="3"/>
+                    <line x1="94" y1="68" x2="106" y2="68" stroke="#0077B6" stroke-width="4"/>
+                    <line x1="53" y1="68" x2="62" y2="68" stroke="#0077B6" stroke-width="3.5"/>
+                    <line x1="138" y1="68" x2="147" y2="68" stroke="#0077B6" stroke-width="3.5"/>
+
+                    <!-- Đôi mắt to long lanh -->
+                    <circle cx="80" cy="94" r="7.5" fill="#1E293B"/>
+                    <circle cx="77.5" cy="91.5" r="2.8" fill="#FFFFFF"/>
+                    <circle cx="120" cy="94" r="7.5" fill="#1E293B"/>
+                    <circle cx="117.5" cy="91.5" r="2.8" fill="#FFFFFF"/>
+
+                    <!-- Má hồng -->
+                    <ellipse cx="66" cy="103" rx="7" ry="4.5" fill="#FF8FAB" opacity="0.65"/>
+                    <ellipse cx="134" cy="103" rx="7" ry="4.5" fill="#FF8FAB" opacity="0.65"/>
+
+                    <!-- Mũi & Miệng mèo cười :3 -->
+                    <polygon points="96,101 104,101 100,106" fill="#FF4D6D"/>
+                    <path d="M91 109 Q95.5 115 100 109 Q104.5 115 109 109" fill="none" stroke="#1E293B" stroke-width="2.5" stroke-linecap="round"/>
+
+                    <!-- Râu mèo -->
+                    <line x1="44" y1="94" x2="58" y2="96" stroke="#94A3B8" stroke-width="2" stroke-linecap="round"/>
+                    <line x1="44" y1="103" x2="58" y2="102" stroke="#94A3B8" stroke-width="2" stroke-linecap="round"/>
+                    <line x1="142" y1="96" x2="156" y2="94" stroke="#94A3B8" stroke-width="2" stroke-linecap="round"/>
+                    <line x1="142" y1="102" x2="156" y2="103" stroke="#94A3B8" stroke-width="2" stroke-linecap="round"/>
+
+                    <!-- Tay trái cầm bình tam giác hóa chất -->
+                    <path d="M62 142 C45 148, 42 162, 54 166" fill="none" stroke="#FFE8A3" stroke-width="11" stroke-linecap="round"/>
+                    <!-- Bình tam giác (Erlenmeyer flask) -->
+                    <polygon points="44,142 52,142 62,172 34,172" fill="#E0F2FE" stroke="#0284C7" stroke-width="2.5" stroke-linejoin="round"/>
+                    <polygon points="39,158 57,158 61,171 35,171" fill="#4CC9F0"/>
+                    <circle cx="46" cy="134" r="3" fill="#4CC9F0" class="flask-dot"/>
+                    <circle cx="52" cy="127" r="2.2" fill="#FF758F" class="flask-dot" style="animation-delay: 0.7s;"/>
+
+                    <!-- Tay phải vẫy chào -->
+                    <g class="cat-paw-wave">
+                        <path d="M138 138 C158 128, 168 112, 160 102" fill="none" stroke="#FFE8A3" stroke-width="12" stroke-linecap="round"/>
+                        <circle cx="160" cy="102" r="7" fill="#FFE8A3" stroke="#F4A261" stroke-width="2"/>
+                        <circle cx="160" cy="102" r="3.5" fill="#FF8FAB"/>
+                    </g>
+                </svg>
+            </div>
+
+            <!-- Tiêu đề chính theo đúng yêu cầu -->
+            <h1 class="font-title text-3xl sm:text-5xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-pink-500 via-purple-500 to-sky-500 leading-tight mb-3 drop-shadow-sm">
+                BẢNG TUẦN HOÀN HOÁ HỌC THÔNG MINH
+            </h1>
+
+            <p class="text-slate-500 font-semibold text-sm sm:text-base max-w-md mb-8">
+                Cùng Mèo Khoa Học Mimi giải mã bí mật đằng sau 118 ô số kỳ diệu và ứng dụng của chúng trong đời sống nhé!
+            </p>
+
+            <!-- Nút PLAY nổi bật bên dưới -->
+            <button id="play-btn" class="btn-play text-white font-title font-black text-2xl sm:text-3xl px-14 py-4 rounded-full tracking-widest uppercase cursor-pointer flex items-center gap-3">
+                <span>PLAY</span>
+                <svg class="w-7 h-7 fill-current" viewBox="0 0 24 24">
+                    <path d="M8 5v14l11-7z"/>
+                </svg>
+            </button>
+        </div>
+    </section>
+
+    <!-- =====================================================================
+         2. GIAO DIỆN BẢNG TUẦN HOÀN 118 NGUYÊN TỐ (MAIN APP)
+    ====================================================================== -->
+    <main id="app-screen" class="hidden relative z-10 max-w-[1380px] mx-auto px-3 sm:px-6 py-4 sm:py-6">
+        
+        <!-- Thanh Header điều hướng & Tìm kiếm -->
+        <header class="bg-white/85 backdrop-blur-md rounded-3xl p-4 sm:p-5 shadow-sm border-2 border-white mb-4 flex flex-col lg:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-3 w-full lg:w-auto justify-between lg:justify-start">
+                <button id="back-home-btn" title="Quay lại màn hình chào" class="flex items-center gap-2 bg-pink-50 hover:bg-pink-100 text-pink-600 font-extrabold px-3.5 py-2 rounded-2xl transition cursor-pointer border border-pink-200">
+                    <span>🏠</span>
+                    <span class="text-sm">Trang chủ</span>
+                </button>
+                <h2 class="font-title font-black text-lg sm:text-xl text-slate-700 text-center">
+                    BẢNG TUẦN HOÀN 118 NGUYÊN TỐ
+                </h2>
+                <!-- Nút bật/tắt âm thanh mobile -->
+                <button id="sound-toggle-mobile" class="lg:hidden bg-sky-50 hover:bg-sky-100 text-sky-600 p-2.5 rounded-2xl border border-sky-200 cursor-pointer" title="Bật/Tắt âm thanh">
+                    🔊
+                </button>
+            </div>
+
+            <!-- Thanh tìm kiếm nhanh + nút âm thanh desktop -->
+            <div class="flex items-center gap-3 w-full lg:w-auto">
+                <div class="relative flex-1 lg:w-80">
+                    <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400">🔍</span>
+                    <input id="search-input" type="text" placeholder="Tìm số hiệu (7), ký hiệu (N) hoặc tên..." 
+                        class="w-full pl-10 pr-9 py-2.5 rounded-2xl bg-slate-50 border-2 border-slate-200 focus:border-pink-400 focus:bg-white focus:outline-none text-sm font-bold text-slate-700 transition">
+                    <button id="clear-search-btn" class="hidden absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-pink-500 font-bold cursor-pointer">✕</button>
+                </div>
+                <button id="sound-toggle-desktop" class="hidden lg:flex items-center gap-1.5 bg-sky-50 hover:bg-sky-100 text-sky-600 font-bold text-sm px-4 py-2.5 rounded-2xl border border-sky-200 transition cursor-pointer">
+                    <span id="sound-icon">🔊</span>
+                    <span id="sound-label">Âm thanh</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Khu vực Mascot hướng dẫn & Bộ lọc 6 phân loại màu sắc -->
+        <div class="grid grid-cols-1 xl:grid-cols-12 gap-4 mb-4 items-center">
+            
+            <!-- Mascot Mèo Mimi góc bảng tuần hoàn với khung thoại -->
+            <div class="xl:col-span-4 bg-white/85 backdrop-blur-md rounded-3xl p-3.5 border-2 border-white shadow-sm flex items-center gap-3.5">
+                <div class="w-16 h-16 shrink-0 cat-float">
+                    <svg viewBox="0 0 200 200" class="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="100" cy="100" r="90" fill="#FFE5EC"/>
+                        <polygon points="52,78 44,30 84,54" fill="#FFD166" stroke="#F4A261" stroke-width="4" stroke-linejoin="round"/>
+                        <polygon points="148,78 156,30 116,54" fill="#FFD166" stroke="#F4A261" stroke-width="4" stroke-linejoin="round"/>
+                        <ellipse cx="100" cy="102" rx="54" ry="46" fill="#FFE8A3" stroke="#F4A261" stroke-width="4"/>
+                        <rect x="58" y="64" width="36" height="22" rx="9" fill="#E0F7FA" stroke="#00B4D8" stroke-width="4"/>
+                        <rect x="106" y="64" width="36" height="22" rx="9" fill="#E0F7FA" stroke="#00B4D8" stroke-width="4"/>
+                        <line x1="94" y1="75" x2="106" y2="75" stroke="#0077B6" stroke-width="5"/>
+                        <circle cx="78" cy="105" r="8.5" fill="#1E293B"/>
+                        <circle cx="75" cy="102" r="3" fill="#FFF"/>
+                        <circle cx="122" cy="105" r="8.5" fill="#1E293B"/>
+                        <circle cx="119" cy="102" r="3" fill="#FFF"/>
+                        <ellipse cx="62" cy="116" rx="8" ry="5" fill="#FF8FAB" opacity="0.7"/>
+                        <ellipse cx="138" cy="116" rx="8" ry="5" fill="#FF8FAB" opacity="0.7"/>
+                        <polygon points="95,113 105,113 100,119" fill="#FF4D6D"/>
+                        <path d="M90 122 Q95 129 100 122 Q105 129 110 122" fill="none" stroke="#1E293B" stroke-width="3" stroke-linecap="round"/>
+                    </svg>
+                </div>
+                <div class="relative bg-pink-50/90 border border-pink-200 rounded-2xl px-4 py-2.5 text-xs sm:text-sm font-bold text-slate-700 flex-1">
+                    <p id="mascot-speech">Bấm vào một ô số bất kỳ trên bảng để khám phá nguyên tố bí ẩn nhé! 🧪✨</p>
+                </div>
+            </div>
+
+            <!-- Chú thích & Bộ lọc 6 nhóm màu -->
+            <div class="xl:col-span-8 bg-white/85 backdrop-blur-md rounded-3xl p-3.5 border-2 border-white shadow-sm">
+                <div class="flex items-center justify-between mb-2 px-1">
+                    <span class="text-xs font-extrabold uppercase tracking-wider text-slate-400">Phân loại 6 nhóm nguyên tố (Bấm để lọc):</span>
+                    <button id="reset-filter-btn" class="hidden text-xs font-extrabold text-pink-500 hover:underline cursor-pointer">Hiển thị tất cả</button>
+                </div>
+                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2" id="legend-container">
+                    <button data-filter="metal" class="legend-btn flex items-center gap-2 px-3 py-2 rounded-2xl border-2 text-left transition cursor-pointer bg-[#FFD6E0]/60 border-[#FF8FAB] text-[#800F2F] hover:scale-105">
+                        <span class="w-3.5 h-3.5 rounded-full bg-[#FF8FAB] shrink-0"></span>
+                        <span class="text-xs font-extrabold leading-tight">Kim loại</span>
+                    </button>
+                    <button data-filter="transition" class="legend-btn flex items-center gap-2 px-3 py-2 rounded-2xl border-2 text-left transition cursor-pointer bg-[#FFE8CC]/60 border-[#FFB703] text-[#7F4F24] hover:scale-105">
+                        <span class="w-3.5 h-3.5 rounded-full bg-[#FFB703] shrink-0"></span>
+                        <span class="text-xs font-extrabold leading-tight">Kim loại chuyển tiếp</span>
+                    </button>
+                    <button data-filter="nonmetal" class="legend-btn flex items-center gap-2 px-3 py-2 rounded-2xl border-2 text-left transition cursor-pointer bg-[#D8F3DC]/60 border-[#52B788] text-[#1B4332] hover:scale-105">
+                        <span class="w-3.5 h-3.5 rounded-full bg-[#52B788] shrink-0"></span>
+                        <span class="text-xs font-extrabold leading-tight">Phi kim</span>
+                    </button>
+                    <button data-filter="noble" class="legend-btn flex items-center gap-2 px-3 py-2 rounded-2xl border-2 text-left transition cursor-pointer bg-[#D0EBFF]/60 border-[#4CC9F0] text-[#023E8A] hover:scale-105">
+                        <span class="w-3.5 h-3.5 rounded-full bg-[#4CC9F0] shrink-0"></span>
+                        <span class="text-xs font-extrabold leading-tight">Khí hiếm</span>
+                    </button>
+                    <button data-filter="lanthanide" class="legend-btn flex items-center gap-2 px-3 py-2 rounded-2xl border-2 text-left transition cursor-pointer bg-[#E5D4EF]/60 border-[#B5179E] text-[#4A148C] hover:scale-105">
+                        <span class="w-3.5 h-3.5 rounded-full bg-[#B5179E] shrink-0"></span>
+                        <span class="text-xs font-extrabold leading-tight">Họ Lanthan</span>
+                    </button>
+                    <button data-filter="actinide" class="legend-btn flex items-center gap-2 px-3 py-2 rounded-2xl border-2 text-left transition cursor-pointer bg-[#FFF3B0]/60 border-[#E09F3E] text-[#540B0E] hover:scale-105">
+                        <span class="w-3.5 h-3.5 rounded-full bg-[#E09F3E] shrink-0"></span>
+                        <span class="text-xs font-extrabold leading-tight">Họ Actin</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Khung Bảng Tuần Hoàn 118 Nguyên Tố (Chỉ hiển thị số hiệu nguyên tử trong mỗi ô) -->
+        <div class="bg-white/80 backdrop-blur-md rounded-[2rem] p-4 sm:p-6 shadow-[0_15px_40px_rgba(148,163,184,0.15)] border-2 border-white">
+            <div class="table-scroll overflow-x-auto pb-2">
+                <!-- Nhãn chu kỳ / nhóm gợi ý nhẹ nhàng -->
+                <div id="periodic-table" class="ptable-grid mx-auto">
+                    <!-- 118 ô nguyên tố sẽ được render bằng JavaScript tại đây -->
+                </div>
+            </div>
+            <p class="text-center text-xs font-bold text-slate-400 mt-3 sm:hidden">
+                👈 Vuốt ngang để xem toàn bộ 18 cột của bảng tuần hoàn 👉
+            </p>
+        </div>
+    </main>
+
+    <!-- =====================================================================
+         3. MODAL THÔNG TIN CHI TIẾT NGUYÊN TỐ
+    ====================================================================== -->
+    <div id="element-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-slate-900/40 backdrop-blur-sm">
+        <div id="modal-card" class="modal-animate relative w-full max-w-2xl bg-white rounded-[2.2rem] shadow-2xl border-4 overflow-hidden max-h-[92vh] flex flex-col">
+            
+            <!-- Header thẻ nguyên tố đồng bộ màu phân loại -->
+            <div id="modal-header" class="p-5 sm:p-6 flex items-center justify-between gap-4 border-b-2">
+                <div class="flex items-center gap-4">
+                    <!-- Huy hiệu Ký hiệu & Số hiệu -->
+                    <div id="modal-badge" class="w-20 h-20 sm:w-24 sm:h-24 rounded-3xl bg-white/90 shadow-inner flex flex-col items-center justify-center border-2 shrink-0">
+                        <span id="modal-atomic-num" class="text-xs sm:text-sm font-black opacity-75">7</span>
+                        <span id="modal-symbol" class="font-title text-3xl sm:text-4xl font-black leading-none my-0.5">N</span>
+                        <span id="modal-mass-short" class="text-[11px] font-bold opacity-75">14,007</span>
+                    </div>
+                    <div>
+                        <span id="modal-category-pill" class="inline-block px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider bg-white/80 mb-1.5 shadow-sm">
+                            Phi kim
+                        </span>
+                        <h3 id="modal-name" class="font-title text-2xl sm:text-3xl font-black leading-tight">
+                            Nitrogen
+                        </h3>
+                        <p class="text-xs sm:text-sm font-bold opacity-80">Tên chuẩn IUPAC</p>
+                    </div>
+                </div>
+
+                <!-- Nút đóng modal -->
+                <button id="close-modal-btn" class="w-11 h-11 rounded-2xl bg-white/80 hover:bg-white flex items-center justify-center text-xl font-black shadow-sm transition hover:scale-105 cursor-pointer shrink-0">
+                    ✕
+                </button>
+            </div>
+
+            <!-- Nội dung chi tiết cuộn được trên màn hình nhỏ -->
+            <div class="p-5 sm:p-6 overflow-y-auto space-y-4 bg-white">
+                
+                <!-- Lưới thông số hóa học đầy đủ -->
+                <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                    <div class="bg-slate-50 p-3 rounded-2xl border border-slate-100">
+                        <div class="text-[11px] font-extrabold uppercase text-slate-400">Số hiệu nguyên tử</div>
+                        <div id="detail-z" class="text-base sm:text-lg font-black text-slate-800 mt-0.5">7</div>
+                    </div>
+                    <div class="bg-slate-50 p-3 rounded-2xl border border-slate-100">
+                        <div class="text-[11px] font-extrabold uppercase text-slate-400">Khối lượng nguyên tử</div>
+                        <div id="detail-mass" class="text-base sm:text-lg font-black text-slate-800 mt-0.5">14,007 u</div>
+                    </div>
+                    <div class="bg-slate-50 p-3 rounded-2xl border border-slate-100">
+                        <div class="text-[11px] font-extrabold uppercase text-slate-400">Nhóm / Chu kì</div>
+                        <div id="detail-group-period" class="text-base sm:text-lg font-black text-slate-800 mt-0.5">Nhóm 15 (VA) • Chu kì 2</div>
+                    </div>
+                    <div class="bg-slate-50 p-3 rounded-2xl border border-slate-100">
+                        <div class="text-[11px] font-extrabold uppercase text-slate-400">Độ âm điện (Pauling)</div>
+                        <div id="detail-electronegativity" class="text-base sm:text-lg font-black text-slate-800 mt-0.5">3,04</div>
+                    </div>
+                    <div class="bg-slate-50 p-3 rounded-2xl border border-slate-100">
+                        <div class="text-[11px] font-extrabold uppercase text-slate-400">Bán kính nguyên tử</div>
+                        <div id="detail-radius" class="text-base sm:text-lg font-black text-slate-800 mt-0.5">56 pm</div>
+                    </div>
+                    <div class="bg-slate-50 p-3 rounded-2xl border border-slate-100">
+                        <div class="text-[11px] font-extrabold uppercase text-slate-400">Phân loại</div>
+                        <div id="detail-category" class="text-base sm:text-lg font-black text-slate-800 mt-0.5">Phi kim</div>
+                    </div>
+                </div>
+
+                <!-- Cấu hình electron -->
+                <div class="bg-indigo-50/70 p-3.5 rounded-2xl border border-indigo-100 flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+                    <span class="text-xs font-extrabold uppercase text-indigo-500">⚛️ Cấu hình Electron:</span>
+                    <span id="detail-config" class="font-mono font-extrabold text-sm sm:text-base text-indigo-950">1s² 2s² 2p³</span>
+                </div>
+
+                <!-- Nguyên tố này ở đâu trong cuộc sống? (Kèm nhân vật mèo vui vẻ) -->
+                <div class="bg-amber-50/80 p-4 rounded-3xl border-2 border-amber-200/80 flex items-start gap-3.5">
+                    <!-- Mascot biểu cảm hào hứng -->
+                    <div class="w-14 h-14 shrink-0 mt-0.5">
+                        <svg viewBox="0 0 200 200" class="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="100" cy="100" r="90" fill="#FFF3B0"/>
+                            <polygon points="52,78 44,30 84,54" fill="#FFD166" stroke="#F4A261" stroke-width="4" stroke-linejoin="round"/>
+                            <polygon points="148,78 156,30 116,54" fill="#FFD166" stroke="#F4A261" stroke-width="4" stroke-linejoin="round"/>
+                            <ellipse cx="100" cy="102" rx="54" ry="46" fill="#FFE8A3" stroke="#F4A261" stroke-width="4"/>
+                            <!-- Mắt cười híp mắt ^ ^ -->
+                            <path d="M66 105 Q78 90 90 105" fill="none" stroke="#1E293B" stroke-width="5" stroke-linecap="round"/>
+                            <path d="M110 105 Q122 90 134 105" fill="none" stroke="#1E293B" stroke-width="5" stroke-linecap="round"/>
+                            <ellipse cx="60" cy="116" rx="9" ry="5" fill="#FF8FAB" opacity="0.8"/>
+                            <ellipse cx="140" cy="116" rx="9" ry="5" fill="#FF8FAB" opacity="0.8"/>
+                            <polygon points="95,113 105,113 100,119" fill="#FF4D6D"/>
+                            <path d="M88 122 Q100 138 112 122 Z" fill="#FF758F" stroke="#1E293B" stroke-width="2.5"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h4 class="font-title font-black text-amber-900 text-sm sm:text-base mb-1 flex items-center gap-1.5">
+                            <span>🌍 Nguyên tố này ở đâu trong cuộc sống?</span>
+                        </h4>
+                        <p id="detail-usage" class="text-slate-700 font-semibold text-sm leading-relaxed">
+                            Chiếm 78% không khí chúng ta thở, dùng để làm phân bón cho cây, bảo quản thực phẩm và làm lạnh siêu sâu ở dạng nitơ lỏng.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Nút chuyển nhanh nguyên tố trước / sau -->
+                <div class="flex items-center justify-between pt-1">
+                    <button id="prev-el-btn" class="px-4 py-2 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-extrabold text-xs sm:text-sm transition cursor-pointer">
+                        ← Nguyên tố trước
+                    </button>
+                    <button id="next-el-btn" class="px-4 py-2 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-extrabold text-xs sm:text-sm transition cursor-pointer">
+                        Nguyên tố tiếp theo →
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /**
+         * =========================================================================
+         * DỮ LIỆU ĐẦY ĐỦ 118 NGUYÊN TỐ HÓA HỌC (CHUẨN IUPAC & ỨNG DỤNG THỰC TẾ)
+         * Cấu trúc mỗi phần tử:
+         * [z, sym, name, mass, config, group, period, en, radius, cat, row, col, usage]
+         * cat: 'metal' | 'transition' | 'nonmetal' | 'noble' | 'lanthanide' | 'actinide'
+         * =========================================================================
+         */
+        const ELEMENTS_RAW = [
+            [1, "H", "Hydrogen", "1,008", "1s¹", "1 (IA)", 1, "2,20", "53 pm", "nonmetal", 1, 1, "Thành phần tạo nên nước (H₂O) và Mặt Trời; dùng làm nhiên liệu tên lửa sạch, sản xuất amoniac và hydro hóa dầu thực vật."],
+            [2, "He", "Helium", "4,0026", "1s²", "18 (VIIIA)", 1, "Không xác định", "31 pm", "noble", 1, 18, "Bơm bóng bay và khinh khí cầu an toàn vì nhẹ hơn không khí và không cháy; dùng làm lạnh nam châm siêu dẫn trong máy chụp MRI."],
+            [3, "Li", "Lithium", "6,94", "[He] 2s¹", "1 (IA)", 2, "0,98", "167 pm", "metal", 2, 1, "Chế tạo pin sạc Lithium-ion cho điện thoại thông minh, laptop và ô tô điện; dùng trong hợp kim siêu nhẹ ngành hàng không."],
+            [4, "Be", "Beryllium", "9,0122", "[He] 2s²", "2 (IIA)", 2, "1,57", "112 pm", "metal", 2, 2, "Làm cửa sổ cho ống tia X y tế, chế tạo linh kiện vệ tinh, kính viễn vọng không gian James Webb và hợp kim đồng chống phát tia lửa."],
+            [5, "B", "Boron", "10,81", "[He] 2s² 2p¹", "13 (IIIA)", 2, "2,04", "87 pm", "nonmetal", 2, 13, "Sản xuất thủy tinh chịu nhiệt borosilicate (dụng cụ thí nghiệm, hộp đựng lò vi sóng), sợi thủy tinh cách nhiệt và chất tẩy rửa."],
+            [6, "C", "Carbon", "12,011", "[He] 2s² 2p²", "14 (IVA)", 2, "2,55", "67 pm", "nonmetal", 2, 14, "Nền tảng của mọi sự sống hữu cơ; tồn tại ở dạng kim cương làm trang sức, than chì làm ruột bút chì và than hoạt tính lọc nước."],
+            [7, "N", "Nitrogen", "14,007", "[He] 2s² 2p³", "15 (VA)", 2, "3,04", "56 pm", "nonmetal", 2, 15, "Chiếm 78% không khí chúng ta thở; dùng để sản xuất phân bón cho cây trồng, bơm gói bim bim bảo quản thực phẩm và làm lạnh siêu sâu ở dạng nitơ lỏng."],
+            [8, "O", "Oxygen", "15,999", "[He] 2s² 2p⁴", "16 (VIA)", 2, "3,44", "48 pm", "nonmetal", 2, 16, "Khí duy trì sự hô hấp của con người và động vật (chiếm 21% không khí); dùng trong bình thở y tế, luyện thép và nhiên liệu đẩy tên lửa."],
+            [9, "F", "Fluorine", "18,998", "[He] 2s² 2p⁵", "17 (VIIA)", 2, "3,98", "42 pm", "nonmetal", 2, 17, "Hợp chất fluoride có trong kem đánh răng giúp ngừa sâu răng; dùng để sản xuất lớp chống dính Teflon trên chảo nấu ăn."],
+            [10, "Ne", "Neon", "20,180", "[He] 2s² 2p⁶", "18 (VIIIA)", 2, "Không xác định", "38 pm", "noble", 2, 18, "Bơm vào các ống đèn quảng cáo phát ra ánh sáng đỏ cam rực rỡ vào ban đêm và dùng trong đèn báo hiệu điện áp cao."],
+            [11, "Na", "Sodium", "22,990", "[Ne] 3s¹", "1 (IA)", 3, "0,93", "190 pm", "metal", 3, 1, "Kết hợp với Clo tạo thành muối ăn (NaCl) thiết yếu hằng ngày; dùng trong đèn đường hơi natri ánh sáng vàng và sản xuất xà phòng."],
+            [12, "Mg", "Magnesium", "24,305", "[Ne] 3s²", "2 (IIA)", 3, "1,31", "145 pm", "metal", 3, 2, "Có trong chất diệp lục giúp cây quang hợp; dùng làm hợp kim siêu nhẹ cho khung máy ảnh, laptop và pháo hoa phát sáng trắng rực."],
+            [13, "Al", "Aluminium", "26,982", "[Ne] 3s² 3p¹", "13 (IIIA)", 3, "1,61", "118 pm", "metal", 3, 13, "Làm vỏ lon nước ngọt, giấy bạc bọc thực phẩm, khung cửa nhôm, dây cáp điện và vỏ máy bay nhờ đặc tính nhẹ, bền và chống gỉ."],
+            [14, "Si", "Silicon", "28,085", "[Ne] 3s² 3p²", "14 (IVA)", 3, "1,90", "111 pm", "nonmetal", 3, 14, "Trái tim của ngành công nghệ: chế tạo vi mạch chip máy tính, điện thoại, pin năng lượng mặt trời và thủy tinh xây dựng từ cát trắng."],
+            [15, "P", "Phosphorus", "30,974", "[Ne] 3s² 3p³", "15 (VA)", 3, "2,19", "98 pm", "nonmetal", 3, 15, "Thành phần cấu tạo nên xương, răng và DNA; dùng làm đầu que diêm an toàn, phân bón lân giúp cây ra hoa kết trái."],
+            [16, "S", "Sulfur", "32,06", "[Ne] 3s² 3p⁴", "16 (VIA)", 3, "2,58", "88 pm", "nonmetal", 3, 16, "Dùng để lưu hóa cao su làm lốp xe bền chắc, sản xuất axit sunfuric công nghiệp, thuốc mỡ trị nấm da và diêm."],
+            [17, "Cl", "Chlorine", "35,45", "[Ne] 3s² 3p⁵", "17 (VIIA)", 3, "3,16", "79 pm", "nonmetal", 3, 17, "Dùng để khử trùng làm sạch nước hồ bơi, xử lý nước sinh hoạt, sản xuất thuốc tẩy trắng và nhựa ống nước PVC."],
+            [18, "Ar", "Argon", "39,948", "[Ne] 3s² 3p⁶", "18 (VIIIA)", 3, "Không xác định", "71 pm", "noble", 3, 18, "Bơm vào bên trong bóng đèn sợi đốt để bảo vệ dây tóc không bị cháy đứt; dùng làm khí bảo vệ trong hàn kim loại."],
+            [19, "K", "Potassium", "39,098", "[Ar] 4s¹", "1 (IA)", 4, "0,82", "243 pm", "metal", 4, 1, "Chất điện giải quan trọng giúp tim và cơ bắp hoạt động (có nhiều trong chuối); thành phần chính của phân bón kali cho cây trồng."],
+            [20, "Ca", "Calcium", "40,078", "[Ar] 4s²", "2 (IIA)", 4, "1,00", "194 pm", "metal", 4, 2, "Giúp xương và răng chắc khỏe (có nhiều trong sữa); hợp chất của canxi tạo nên đá vôi, xi măng xây dựng và phấn viết bảng."],
+            [21, "Sc", "Scandium", "44,956", "[Ar] 3d¹ 4s²", "3 (IIIB)", 4, "1,36", "184 pm", "transition", 4, 3, "Pha vào hợp kim nhôm để chế tạo khung xe đạp đua cao cấp, gậy bóng chày siêu bền và đèn chiếu sáng sân vận động."],
+            [22, "Ti", "Titanium", "47,867", "[Ar] 3d² 4s²", "4 (IVB)", 4, "1,54", "176 pm", "transition", 4, 4, "Siêu bền, nhẹ và không bị cơ thể đào thải nên dùng làm khớp xương nhân tạo, trụ răng Implant, vỏ tàu vũ trụ và sơn trắng."],
+            [23, "V", "Vanadium", "50,942", "[Ar] 3d³ 4s²", "5 (VB)", 4, "1,63", "171 pm", "transition", 4, 5, "Tạo nên hợp kim thép cực kỳ dẻo dai để chế tạo cờ lê, mỏ lết, trục khuỷu ô tô và lò xo chịu lực cao."],
+            [24, "Cr", "Chromium", "51,996", "[Ar] 3d⁵ 4s¹", "6 (VIB)", 4, "1,66", "166 pm", "transition", 4, 6, "Tạo lớp mạ sáng bóng chống gỉ trên vòi nước, phụ tùng xe máy và là thành phần giúp thép không gỉ (Inox) luôn sáng đẹp."],
+            [25, "Mn", "Manganese", "54,938", "[Ar] 3d⁵ 4s²", "7 (VIIB)", 4, "1,55", "161 pm", "transition", 4, 7, "Làm cứng thép để chế tạo đường ray xe lửa, két sắt chống trộm; hợp chất MnO₂ dùng làm lõi pin kiềm thông dụng."],
+            [26, "Fe", "Iron", "55,845", "[Ar] 3d⁶ 4s²", "8 (VIIIB)", 4, "1,83", "156 pm", "transition", 4, 8, "Kim loại phổ biến nhất để luyện gang và thép xây dựng cầu đường, nhà cửa; có trong hồng cầu máu giúp vận chuyển oxy đi khắp cơ thể."],
+            [27, "Co", "Cobalt", "58,933", "[Ar] 3d⁷ 4s²", "9 (VIIIB)", 4, "1,88", "152 pm", "transition", 4, 9, "Tạo màu xanh lam đặc trưng tuyệt đẹp cho gốm sứ và thủy tinh; dùng trong cực pin xe điện và nam châm vĩnh cửu."],
+            [28, "Ni", "Nickel", "58,693", "[Ar] 3d⁸ 4s²", "10 (VIIIB)", 4, "1,91", "149 pm", "transition", 4, 10, "Dùng để đúc tiền xu, mạ bảo vệ kim loại chống ăn mòn, làm dây đàn guitar điện và pin sạc NiMH."],
+            [29, "Cu", "Copper", "63,546", "[Ar] 3d¹⁰ 4s¹", "11 (IB)", 4, "1,90", "145 pm", "transition", 4, 11, "Dẫn điện và dẫn nhiệt tuyệt vời nên dùng làm lõi dây điện gia dụng, ống dẫn điều hòa, bộ tản nhiệt máy tính và đồ đồng mỹ nghệ."],
+            [30, "Zn", "Zinc", "65,38", "[Ar] 3d¹⁰ 4s²", "12 (IIB)", 4, "1,65", "142 pm", "transition", 4, 12, "Tráng lên tôn lợp mái nhà để chống gỉ sét; oxit kẽm có trong kem chống nắng vật lý và vi chất giúp tăng cường miễn dịch."],
+            [31, "Ga", "Gallium", "69,723", "[Ar] 3d¹⁰ 4s² 4p¹", "13 (IIIA)", 4, "1,81", "136 pm", "metal", 4, 13, "Kim loại độc đáo có thể tan chảy ngay trên lòng bàn tay (29,8°C); dùng chế tạo đèn LED phát sáng và bộ sạc nhanh GaN."],
+            [32, "Ge", "Germanium", "72,630", "[Ar] 3d¹⁰ 4s² 4p²", "14 (IVA)", 4, "2,01", "125 pm", "nonmetal", 4, 14, "Vật liệu bán dẫn quan trọng trong cáp quang internet tốc độ cao, ống kính camera hồng ngoại nhìn ban đêm."],
+            [33, "As", "Arsenic", "74,922", "[Ar] 3d¹⁰ 4s² 4p³", "15 (VA)", 4, "2,18", "114 pm", "nonmetal", 4, 15, "Dùng trong công nghệ bán dẫn tốc độ cao (Gallium Arsenide) cho viễn thông 5G và pin mặt trời vệ tinh."],
+            [34, "Se", "Selenium", "78,971", "[Ar] 3d¹⁰ 4s² 4p⁴", "16 (VIA)", 4, "2,55", "103 pm", "nonmetal", 4, 16, "Thành phần trong dầu gội trị gàu chuyên dụng, trống cảm quang của máy photocopy và vi chất chống oxy hóa cho cơ thể."],
+            [35, "Br", "Bromine", "79,904", "[Ar] 3d¹⁰ 4s² 4p⁵", "17 (VIIA)", 4, "2,96", "94 pm", "nonmetal", 4, 17, "Phi kim duy nhất ở thể lỏng ở nhiệt độ phòng; dùng sản xuất chất chống cháy cho vỏ nhựa thiết bị điện tử và xử lý nước."],
+            [36, "Kr", "Krypton", "83,798", "[Ar] 3d¹⁰ 4s² 4p⁶", "18 (VIIIA)", 4, "3,00", "88 pm", "noble", 4, 18, "Bơm vào bóng đèn flash máy ảnh chuyên nghiệp, đèn chiếu sáng đường băng sân bay và cửa kính cách âm hai lớp."],
+            [37, "Rb", "Rubidium", "85,468", "[Kr] 5s¹", "1 (IA)", 5, "0,82", "265 pm", "metal", 5, 1, "Dùng trong đồng hồ nguyên tử có độ chính xác cực cao cho hệ thống định vị GPS và tạo màu tím đỏ cho pháo hoa."],
+            [38, "Sr", "Strontium", "87,62", "[Kr] 5s²", "2 (IIA)", 5, "0,95", "219 pm", "metal", 5, 2, "Tạo ra ánh sáng màu đỏ thắm rực rỡ trong pháo hoa và pháo sáng cứu hộ; dùng trong một số loại kem đánh răng giảm ê buốt."],
+            [39, "Y", "Yttrium", "88,906", "[Kr] 4d¹ 5s²", "3 (IIIB)", 5, "1,22", "212 pm", "transition", 5, 3, "Tạo bột huỳnh quang màu đỏ trên màn hình TV, đèn LED trắng và chế tạo đá trang sức nhân tạo Cubic Zirconia lấp lánh."],
+            [40, "Zr", "Zirconium", "91,224", "[Kr] 4d² 5s²", "4 (IVB)", 5, "1,33", "206 pm", "transition", 5, 4, "Làm răng sứ thẩm mỹ Zirconia siêu cứng, lớp vỏ bảo vệ thanh nhiên liệu lò phản ứng hạt nhân và dao gốm chống cùn."],
+            [41, "Nb", "Niobium", "92,906", "[Kr] 4d⁴ 5s¹", "5 (VB)", 5, "1,60", "198 pm", "transition", 5, 5, "Chế tạo nam châm siêu dẫn trong máy chụp cộng hưởng từ MRI, máy gia tốc hạt và thép chịu nhiệt cho động cơ tên lửa."],
+            [42, "Mo", "Molybdenum", "95,95", "[Kr] 4d⁵ 5s¹", "6 (VIB)", 5, "2,16", "190 pm", "transition", 5, 6, "Pha vào thép để chịu được nhiệt độ và áp suất cực lớn trong các nhà máy điện, giàn khoan dầu khí và chất bôi trơn công nghiệp."],
+            [43, "Tc", "Technetium", "98", "[Kr] 4d⁵ 5s²", "7 (VIIB)", 5, "1,90", "183 pm", "transition", 5, 7, "Nguyên tố nhân tạo đầu tiên; đồng vị Tc-99m được dùng rộng rãi trong y học hạt nhân để chụp chẩn đoán hình ảnh tim và xương."],
+            [44, "Ru", "Ruthenium", "101,07", "[Kr] 4d⁷ 5s¹", "8 (VIIIB)", 5, "2,20", "178 pm", "transition", 5, 8, "Phủ lên ngòi bút máy cao cấp để chống mài mòn, tăng dung lượng lưu trữ cho đĩa từ ổ cứng máy tính và linh kiện điện tử."],
+            [45, "Rh", "Rhodium", "102,91", "[Kr] 4d⁸ 5s¹", "9 (VIIIB)", 5, "2,28", "173 pm", "transition", 5, 9, "Kim loại quý đắt giá dùng để mạ trang sức vàng trắng cho độ sáng bóng hoàn hảo và làm bộ xúc tác lọc khí thải ô tô."],
+            [46, "Pd", "Palladium", "106,42", "[Kr] 4d¹⁰", "10 (VIIIB)", 5, "2,20", "169 pm", "transition", 5, 10, "Chuyển hóa khí thải độc hại từ ống xả ô tô thành khí vô hại, chế tác trang sức bạch kim và tụ điện gốm trong điện thoại."],
+            [47, "Ag", "Silver", "107,87", "[Kr] 4d¹⁰ 5s¹", "11 (IB)", 5, "1,93", "165 pm", "transition", 5, 11, "Kim loại dẫn điện tốt nhất thế giới; dùng chế tác trang sức, bộ đồ ăn bằng bạc, gương soi cao cấp và màng lọc kháng khuẩn."],
+            [48, "Cd", "Cadmium", "112,41", "[Kr] 4d¹⁰ 5s²", "12 (IIB)", 5, "1,69", "161 pm", "transition", 5, 12, "Dùng trong pin sạc Nickel-Cadmium chuyên dụng, lớp mạ chống ăn mòn cho bu-lông hàng không và bột màu hội họa."],
+            [49, "In", "Indium", "114,82", "[Kr] 4d¹⁰ 5s² 5p¹", "13 (IIIA)", 5, "1,78", "156 pm", "metal", 5, 13, "Tạo nên lớp màng dẫn điện trong suốt (ITO) giúp màn hình cảm ứng điện thoại thông minh và máy tính bảng nhận diện ngón tay bạn."],
+            [50, "Sn", "Tin", "118,71", "[Kr] 4d¹⁰ 5s² 5p²", "14 (IVA)", 5, "1,96", "145 pm", "metal", 5, 14, "Tráng bên trong vỏ hộp thiếc đựng thực phẩm chống gỉ và dùng làm hợp kim thiếc hàn kết nối linh kiện trên bo mạch điện tử."],
+            [51, "Sb", "Antimony", "121,76", "[Kr] 4d¹⁰ 5s² 5p³", "15 (VA)", 5, "2,05", "133 pm", "nonmetal", 5, 15, "Tăng độ cứng cho bản cực chì trong ắc quy ô tô và dùng làm chất phụ gia chống cháy cho vải rèm, nhựa bọc dây điện."],
+            [52, "Te", "Tellurium", "127,60", "[Kr] 4d¹⁰ 5s² 5p⁴", "16 (VIA)", 5, "2,10", "123 pm", "nonmetal", 5, 16, "Chế tạo tấm pin năng lượng mặt trời màng mỏng hiệu suất cao và đĩa quang lưu trữ dữ liệu có thể ghi xóa nhiều lần."],
+            [53, "I", "Iodine", "126,90", "[Kr] 4d¹⁰ 5s² 5p⁵", "17 (VIIA)", 5, "2,66", "115 pm", "nonmetal", 5, 17, "Bổ sung vào muối ăn (muối i-ốt) để phòng bệnh bướu cổ và giúp phát triển trí não; dung dịch cồn i-ốt dùng sát trùng vết thương."],
+            [54, "Xe", "Xenon", "131,29", "[Kr] 4d¹⁰ 5s² 5p⁶", "18 (VIIIA)", 5, "2,60", "108 pm", "noble", 5, 18, "Dùng trong đèn pha ô tô siêu sáng (đèn Xenon HID), đèn máy chiếu rạp phim IMAX và làm nhiên liệu đẩy ion cho tàu vũ trụ."],
+            [55, "Cs", "Caesium", "132,91", "[Xe] 6s¹", "1 (IA)", 6, "0,79", "298 pm", "metal", 6, 1, "Chuẩn mực đo thời gian của thế giới: định nghĩa đơn vị 'giây' thông qua đồng hồ nguyên tử Caesium siêu chính xác."],
+            [56, "Ba", "Barium", "137,33", "[Xe] 6s²", "2 (IIA)", 6, "0,89", "253 pm", "metal", 6, 2, "Tạo ánh sáng màu xanh lục tươi sáng cho pháo hoa; dung dịch Bari sunfat giúp bác sĩ chụp X-quang đường tiêu hóa rõ nét."],
+            // Họ Lanthan (57 - 71) xếp ở hàng 9, cột 3..17
+            [57, "La", "Lanthanum", "138,91", "[Xe] 5d¹ 6s²", "3 (IIIB)", 6, "1,10", "195 pm", "lanthanide", 9, 3, "Chế tạo thấu kính thủy tinh quang học cao cấp cho máy ảnh kỹ thuật số, kính thiên văn và pin của xe hybrid."],
+            [58, "Ce", "Cerium", "140,12", "[Xe] 4f¹ 5d¹ 6s²", "3 (IIIB)", 6, "1,12", "185 pm", "lanthanide", 9, 4, "Thành phần tạo ra đá lửa trong bật lửa gas và bột đánh bóng bề mặt kính màn hình điện thoại mịn như gương."],
+            [59, "Pr", "Praseodymium", "140,91", "[Xe] 4f³ 6s²", "3 (IIIB)", 6, "1,13", "185 pm", "lanthanide", 9, 5, "Chế tạo kính bảo hộ cho thợ thổi thủy tinh và thợ hàn (lọc tia sáng vàng chói) và nam châm siêu mạnh cho tuabin gió."],
+            [60, "Nd", "Neodymium", "144,24", "[Xe] 4f⁴ 6s²", "3 (IIIB)", 6, "1,14", "185 pm", "lanthanide", 9, 6, "Tạo ra loại nam châm vĩnh cửu mạnh nhất thế giới (nam châm đất hiếm) có trong tai nghe, loa, ổ cứng và động cơ ô tô điện."],
+            [61, "Pm", "Promethium", "145", "[Xe] 4f⁵ 6s²", "3 (IIIB)", 6, "1,13", "185 pm", "lanthanide", 9, 7, "Nguyên tố đất hiếm phóng xạ duy nhất; dùng làm nguồn pin hạt nhân siêu nhỏ bền bỉ nhiều năm cho tàu thăm dò không gian."],
+            [62, "Sm", "Samarium", "150,36", "[Xe] 4f⁶ 6s²", "3 (IIIB)", 6, "1,17", "185 pm", "lanthanide", 9, 8, "Làm nam châm chịu nhiệt độ rất cao trong động cơ máy bay, thiết bị quân sự và bộ cảm biến âm thanh guitar điện."],
+            [63, "Eu", "Europium", "151,96", "[Xe] 4f⁷ 6s²", "3 (IIIB)", 6, "1,20", "185 pm", "lanthanide", 9, 9, "Tạo bột phát quang màu đỏ và xanh lam trên màn hình TV, đèn huỳnh quang tiết kiệm điện và mực chống làm giả tiền Euro."],
+            [64, "Gd", "Gadolinium", "157,25", "[Xe] 4f⁷ 5d¹ 6s²", "3 (IIIB)", 6, "1,20", "180 pm", "lanthanide", 9, 10, "Dùng làm thuốc cản quang tiêm tĩnh mạch giúp hình ảnh chụp cộng hưởng từ MRI mạch máu và khối u hiển thị rõ nét."],
+            [65, "Tb", "Terbium", "158,93", "[Xe] 4f⁹ 6s²", "3 (IIIB)", 6, "1,20", "175 pm", "lanthanide", 9, 11, "Tạo ánh sáng màu xanh lục rực rỡ trên màn hình điện thoại, bóng đèn tiết kiệm năng lượng và thiết bị định vị sóng âm sonar."],
+            [66, "Dy", "Dysprosium", "162,50", "[Xe] 4f¹⁰ 6s²", "3 (IIIB)", 6, "1,22", "175 pm", "lanthanide", 9, 12, "Giúp nam châm trong động cơ xe điện và tuabin điện gió ngoài khơi không bị mất từ tính khi hoạt động ở nhiệt độ cao."],
+            [67, "Ho", "Holmium", "164,93", "[Xe] 4f¹¹ 6s²", "3 (IIIB)", 6, "1,23", "175 pm", "lanthanide", 9, 13, "Tạo ra từ trường mạnh nhất từng được biết đến trong phòng thí nghiệm và dùng trong tia laser y tế phẫu thuật mắt, tán sỏi thận."],
+            [68, "Er", "Erbium", "167,26", "[Xe] 4f¹² 6s²", "3 (IIIB)", 6, "1,24", "175 pm", "lanthanide", 9, 14, "Khuếch đại tín hiệu ánh sáng trong cáp quang xuyên đại dương giúp internet truyền đi khắp thế giới và tạo kính màu hồng."],
+            [69, "Tm", "Thulium", "168,93", "[Xe] 4f¹³ 6s²", "3 (IIIB)", 6, "1,25", "175 pm", "lanthanide", 9, 15, "Nguồn phát tia X cho các máy chụp X-quang di động nhỏ gọn cấp cứu tại hiện trường và laser phẫu thuật ít xâm lấn."],
+            [70, "Yb", "Ytterbium", "173,05", "[Xe] 4f¹⁴ 6s²", "3 (IIIB)", 6, "1,10", "175 pm", "lanthanide", 9, 16, "Cải thiện độ bền của thép không gỉ, dùng trong máy cắt laser công nghiệp chính xác cao và đồng hồ quang học nguyên tử."],
+            [71, "Lu", "Lutetium", "174,97", "[Xe] 4f¹⁴ 5d¹ 6s²", "3 (IIIB)", 6, "1,27", "175 pm", "lanthanide", 9, 17, "Dùng làm đầu dò tinh thể trong máy chụp cắt lớp phát xạ Positron (PET scan) tầm soát ung thư và chất xúc tác lọc hóa dầu."],
+            // Tiếp tục chu kỳ 6 (72 - 86)
+            [72, "Hf", "Hafnium", "178,49", "[Xe] 4f¹⁴ 5d² 6s²", "4 (IVB)", 6, "1,30", "155 pm", "transition", 6, 4, "Làm thanh điều khiển hấp thụ neutron an toàn trong lò phản ứng hạt nhân và lớp cách điện siêu mỏng trong chip vi xử lý."],
+            [73, "Ta", "Tantalum", "180,95", "[Xe] 4f¹⁴ 5d³ 6s²", "5 (VB)", 6, "1,50", "145 pm", "transition", 6, 5, "Chế tạo tụ điện Tantalum siêu nhỏ nằm bên trong hầu hết mọi chiếc điện thoại thông minh, laptop và máy trợ thính."],
+            [74, "W", "Tungsten", "183,84", "[Xe] 4f¹⁴ 5d⁴ 6s²", "6 (VIB)", 6, "2,36", "135 pm", "transition", 6, 6, "Kim loại có nhiệt độ nóng chảy cao nhất (3.422°C); dùng làm dây tóc bóng đèn sợi đốt, mũi khoan siêu cứng và đầu bi bút bi."],
+            [75, "Re", "Rhenium", "186,21", "[Xe] 4f¹⁴ 5d⁵ 6s²", "7 (VIIB)", 6, "1,90", "135 pm", "transition", 6, 7, "Tạo siêu hợp kim chịu nhiệt cực hạn cho cánh tuabin động cơ máy bay phản lực và tên lửa vũ trụ."],
+            [76, "Os", "Osmium", "190,23", "[Xe] 4f¹⁴ 5d⁶ 6s²", "8 (VIIIB)", 6, "2,20", "130 pm", "transition", 6, 8, "Nguyên tố tự nhiên có khối lượng riêng nặng nhất Trái Đất; dùng làm đầu kim máy quay đĩa than và ngòi bút máy siêu bền."],
+            [77, "Ir", "Iridium", "192,22", "[Xe] 4f¹⁴ 5d⁷ 6s²", "9 (VIIIB)", 6, "2,20", "135 pm", "transition", 6, 9, "Kim loại chống ăn mòn tốt nhất; dùng làm điện cực bugi đánh lửa ô tô siêu bền và khuôn đúc màn hình OLED."],
+            [78, "Pt", "Platinum", "195,08", "[Xe] 4f¹⁴ 5d⁹ 6s¹", "10 (VIIIB)", 6, "2,28", "135 pm", "transition", 6, 10, "Kim loại quý hiếm (Bạch kim) dùng chế tác nhẫn cưới cao cấp, thuốc điều trị ung thư Cisplatin và pin nhiên liệu hydro."],
+            [79, "Au", "Gold", "196,97", "[Xe] 4f¹⁴ 5d¹⁰ 6s¹", "11 (IB)", 6, "2,54", "135 pm", "transition", 6, 11, "Chế tác trang sức, dự trữ tài chính quốc gia và mạ chân tiếp xúc trong vi mạch điện thoại, vệ tinh vì không bao giờ bị oxy hóa."],
+            [80, "Hg", "Mercury", "200,59", "[Xe] 4f¹⁴ 5d¹⁰ 6s²", "12 (IIB)", 6, "2,00", "150 pm", "transition", 6, 12, "Kim loại duy nhất ở thể lỏng ở nhiệt độ phòng; từng dùng phổ biến trong nhiệt kế thủy tinh, huyết áp kế và đèn huỳnh quang."],
+            [81, "Tl", "Thallium", "204,38", "[Xe] 4f¹⁴ 5d¹⁰ 6s² 6p¹", "13 (IIIA)", 6, "1,62", "190 pm", "metal", 6, 13, "Dùng trong cảm biến hồng ngoại chuyên dụng, thiết bị quang học truyền ánh sáng hồng ngoại và nghiên cứu vật liệu siêu dẫn."],
+            [82, "Pb", "Lead", "207,2", "[Xe] 4f¹⁴ 5d¹⁰ 6s² 6p²", "14 (IVA)", 6, "2,33", "180 pm", "metal", 6, 14, "Làm bản cực bình ắc quy axit-chì khởi động ô tô, xe máy và tấm chắn bảo vệ bác sĩ khỏi tia X trong phòng chụp X-quang."],
+            [83, "Bi", "Bismuth", "208,98", "[Xe] 4f¹⁴ 5d¹⁰ 6s² 6p³", "15 (VA)", 6, "2,02", "160 pm", "metal", 6, 15, "Thành phần chính trong thuốc đau dạ dày Pepto-Bismol và dùng thay thế chì không độc hại trong đạn săn, mỹ phẩm ánh ngọc trai."],
+            [84, "Po", "Polonium", "209", "[Xe] 4f¹⁴ 5d¹⁰ 6s² 6p⁴", "16 (VIA)", 6, "2,00", "190 pm", "metal", 6, 16, "Nguyên tố phóng xạ do nhà khoa học Marie Curie tìm ra; dùng làm nguồn nhiệt cho vệ tinh không gian và chổi khử tĩnh điện công nghiệp."],
+            [85, "At", "Astatine", "210", "[Xe] 4f¹⁴ 5d¹⁰ 6s² 6p⁵", "17 (VIIA)", 6, "2,20", "200 pm", "nonmetal", 6, 17, "Nguyên tố tự nhiên hiếm nhất trên vỏ Trái Đất; đang được nghiên cứu trong liệu pháp xạ trị nhắm trúng đích tiêu diệt tế bào ung thư."],
+            [86, "Rn", "Radon", "222", "[Xe] 4f¹⁴ 5d¹⁰ 6s² 6p⁶", "18 (VIIIA)", 6, "2,20", "220 pm", "noble", 6, 18, "Khí hiếm phóng xạ tự nhiên thoát ra từ đất đá; được các nhà địa chất theo dõi để dự báo sớm hoạt động động đất."],
+            // Chu kỳ 7 (87, 88)
+            [87, "Fr", "Francium", "223", "[Rn] 7s¹", "1 (IA)", 7, "0,70", "348 pm", "metal", 7, 1, "Kim loại kiềm cực kỳ hiếm và phóng xạ mạnh (chu kỳ bán rã chỉ 22 phút); chỉ dùng trong các nghiên cứu vật lý nguyên tử cơ bản."],
+            [88, "Ra", "Radium", "226", "[Rn] 7s²", "2 (IIA)", 7, "0,90", "283 pm", "metal", 7, 2, "Phát ánh sáng xanh lục trong bóng tối nên xưa kia dùng sơn mặt đồng hồ dạ quang; nay dùng điều trị một số loại ung thư xương."],
+            // Họ Actin (89 - 103) xếp ở hàng 10, cột 3..17
+            [89, "Ac", "Actinium", "227", "[Rn] 6d¹ 7s²", "3 (IIIB)", 7, "1,10", "195 pm", "actinide", 10, 3, "Nguồn phát neutron mạnh trong nghiên cứu khoa học và đồng vị Ac-225 đang được ứng dụng trong y học điều trị ung thư tiên tiến."],
+            [90, "Th", "Thorium", "232,04", "[Rn] 6d² 7s²", "3 (IIIB)", 7, "1,30", "180 pm", "actinide", 10, 4, "Nhiên liệu hạt nhân tiềm năng sạch và an toàn hơn Uranium; dùng làm lưới đèn măng-sông phát sáng trắng rực."],
+            [91, "Pa", "Protactinium", "231,04", "[Rn] 5f² 6d¹ 7s²", "3 (IIIB)", 7, "1,50", "180 pm", "actinide", 10, 5, "Nguyên tố phóng xạ rất hiếm trong quặng urani; giúp các nhà hải dương học xác định niên đại trầm tích đáy biển cổ đại."],
+            [92, "U", "Uranium", "238,03", "[Rn] 5f³ 6d¹ 7s²", "3 (IIIB)", 7, "1,38", "175 pm", "actinide", 10, 6, "Nhiên liệu chính cho các nhà máy điện hạt nhân cung cấp điện năng khổng lồ không phát thải khí nhà kính và tàu ngầm hạt nhân."],
+            [93, "Np", "Neptunium", "237", "[Rn] 5f⁴ 6d¹ 7s²", "3 (IIIB)", 7, "1,36", "175 pm", "actinide", 10, 7, "Nguyên tố siêu urani đầu tiên được tổng hợp; dùng làm tiền chất để sản xuất Plutonium-238 cấp năng lượng cho tàu vũ trụ."],
+            [94, "Pu", "Plutonium", "244", "[Rn] 5f⁶ 7s²", "3 (IIIB)", 7, "1,28", "175 pm", "actinide", 10, 8, "Nguồn cung cấp điện nhiệt đồng vị phóng xạ bền bỉ cho tàu thăm dò sao Hỏa Curiosity, Perseverance và tàu Voyager bay ra ngoài hệ Mặt Trời."],
+            [95, "Am", "Americium", "243", "[Rn] 5f⁷ 7s²", "3 (IIIB)", 7, "1,13", "175 pm", "actinide", 10, 9, "Có mặt ngay trong nhà bạn: một lượng siêu nhỏ Am-241 nằm bên trong thiết bị báo cháy (đầu dò khói) giúp cứu sống hàng ngàn người."],
+            [96, "Cm", "Curium", "247", "[Rn] 5f⁷ 6d¹ 7s²", "3 (IIIB)", 7, "1,28", "175 pm", "actinide", 10, 10, "Được đặt theo tên vợ chồng nhà bác học Marie & Pierre Curie; dùng làm nguồn phát tia alpha phân tích thành phần đá trên sao Hỏa."],
+            [97, "Bk", "Berkelium", "247", "[Rn] 5f⁹ 7s²", "3 (IIIB)", 7, "1,30", "175 pm", "actinide", 10, 11, "Nguyên tố nhân tạo dùng làm bia bắn phá trong máy gia tốc để tổng hợp nên các nguyên tố siêu nặng mới như Tennessine."],
+            [98, "Cf", "Californium", "251", "[Rn] 5f¹⁰ 7s²", "3 (IIIB)", 7, "1,30", "175 pm", "actinide", 10, 12, "Nguồn phát neutron di động mạnh giúp dò tìm các mỏ vàng, bạc, dầu mỏ dưới lòng đất và kiểm tra vết nứt bên trong cánh máy bay."],
+            [99, "Es", "Einsteinium", "252", "[Rn] 5f¹¹ 7s²", "3 (IIIB)", 7, "1,30", "175 pm", "actinide", 10, 13, "Đặt theo tên thiên tài Albert Einstein; chỉ được tạo ra với lượng siêu nhỏ phục vụ nghiên cứu khoa học hạt nhân cơ bản."],
+            [100, "Fm", "Fermium", "257", "[Rn] 5f¹² 7s²", "3 (IIIB)", 7, "1,30", "175 pm", "actinide", 10, 14, "Nguyên tố nặng nhất có thể tạo ra bằng cách bắn phá neutron; đặt theo tên nhà vật lý Enrico Fermi."],
+            [101, "Md", "Mendelevium", "258", "[Rn] 5f¹³ 7s²", "3 (IIIB)", 7, "1,30", "175 pm", "actinide", 10, 15, "Đặt theo tên cha đẻ của Bảng tuần hoàn Dmitri Mendeleev; được tổng hợp từng nguyên tử một để nghiên cứu tính chất hóa học nguyên tố nặng."],
+            [102, "No", "Nobelium", "259", "[Rn] 5f¹⁴ 7s²", "3 (IIIB)", 7, "1,30", "175 pm", "actinide", 10, 16, "Đặt theo tên nhà phát minh Alfred Nobel; nguyên tố phóng xạ nhân tạo có thời gian tồn tại chỉ vài chục giây trong phòng thí nghiệm."],
+            [103, "Lr", "Lawrencium", "266", "[Rn] 5f¹⁴ 7s² 7p¹", "3 (IIIB)", 7, "1,30", "175 pm", "actinide", 10, 17, "Nguyên tố cuối cùng của họ Actin, đặt theo tên Ernest Lawrence - người phát minh ra máy gia tốc hạt Cyclotron."],
+            // Tiếp tục chu kỳ 7 (104 - 118)
+            [104, "Rf", "Rutherfordium", "267", "[Rn] 5f¹⁴ 6d² 7s²", "4 (IVB)", 7, "Không xác định", "150 pm", "transition", 7, 4, "Nguyên tố siêu nặng nhân tạo đặt theo tên Ernest Rutherford; chỉ tồn tại trong phòng thí nghiệm vật lý hạt nhân."],
+            [105, "Db", "Dubnium", "268", "[Rn] 5f¹⁴ 6d³ 7s²", "5 (VB)", 7, "Không xác định", "139 pm", "transition", 7, 5, "Được tổng hợp nhân tạo trong máy gia tốc hạt, dùng để nghiên cứu giới hạn bền vững của hạt nhân nguyên tử."],
+            [106, "Sg", "Seaborgium", "269", "[Rn] 5f¹⁴ 6d⁴ 7s²", "6 (VIB)", 7, "Không xác định", "132 pm", "transition", 7, 6, "Đặt theo tên nhà hóa học Glenn T. Seaborg; chỉ tạo ra được vài nguyên tử mỗi lần thí nghiệm để kiểm chứng quy luật tuần hoàn."],
+            [107, "Bh", "Bohrium", "270", "[Rn] 5f¹⁴ 6d⁵ 7s²", "7 (VIIB)", 7, "Không xác định", "128 pm", "transition", 7, 7, "Đặt theo tên nhà vật lý Niels Bohr; đồng vị bền nhất tồn tại khoảng 1 phút trong các phòng thí nghiệm chuyên sâu."],
+            [108, "Hs", "Hassium", "277", "[Rn] 5f¹⁴ 6d⁶ 7s²", "8 (VIIIB)", 7, "Không xác định", "126 pm", "transition", 7, 8, "Nguyên tố nhân tạo có mật độ dự đoán cực kỳ cao, được nghiên cứu để hiểu cấu trúc lớp vỏ hạt nhân nguyên tử."],
+            [109, "Mt", "Meitnerium", "278", "[Rn] 5f¹⁴ 6d⁷ 7s²", "9 (VIIIB)", 7, "Không xác định", "128 pm", "transition", 7, 9, "Đặt theo tên nhà nữ vật lý hạt nhân Lise Meitner; chỉ phục vụ mục đích nghiên cứu khoa học cơ bản."],
+            [110, "Ds", "Darmstadtium", "281", "[Rn] 5f¹⁴ 6d⁸ 7s²", "10 (VIIIB)", 7, "Không xác định", "132 pm", "transition", 7, 10, "Được tạo ra tại thành phố Darmstadt (Đức) bằng cách bắn chùm ion Niken vào bia Chì."],
+            [111, "Rg", "Roentgenium", "282", "[Rn] 5f¹⁴ 6d⁹ 7s²", "11 (IB)", 7, "Không xác định", "138 pm", "transition", 7, 11, "Đặt theo tên Wilhelm Röntgen - người tìm ra tia X; thuộc cùng nhóm với Đồng, Bạc và Vàng."],
+            [112, "Cn", "Copernicium", "285", "[Rn] 5f¹⁴ 6d¹⁰ 7s²", "12 (IIB)", 7, "Không xác định", "147 pm", "transition", 7, 12, "Đặt theo tên nhà thiên văn Nicolaus Copernicus; các thí nghiệm cho thấy nó có tính chất giống một chất khí dễ bay hơi."],
+            [113, "Nh", "Nihonium", "286", "[Rn] 5f¹⁴ 6d¹⁰ 7s² 7p¹", "13 (IIIA)", 7, "Không xác định", "170 pm", "metal", 7, 13, "Nguyên tố đầu tiên được phát hiện tại châu Á (Nhật Bản - 'Nihon'); mở rộng biên giới hiểu biết của loài người về vật chất."],
+            [114, "Fl", "Flerovium", "289", "[Rn] 5f¹⁴ 6d¹⁰ 7s² 7p²", "14 (IVA)", 7, "Không xác định", "180 pm", "metal", 7, 14, "Nguyên tố siêu nặng nằm gần 'đảo bền vững' hạt nhân, giúp các nhà vật lý kiểm tra thuyết tương đối trong hóa học."],
+            [115, "Mc", "Moscovium", "290", "[Rn] 5f¹⁴ 6d¹⁰ 7s² 7p³", "15 (VA)", 7, "Không xác định", "187 pm", "metal", 7, 15, "Được tổng hợp tại viện nghiên cứu Dubna gần Moscow; chỉ tồn tại trong vài phần nghìn giây trước khi phân rã."],
+            [116, "Lv", "Livermorium", "293", "[Rn] 5f¹⁴ 6d¹⁰ 7s² 7p⁴", "16 (VIA)", 7, "Không xác định", "183 pm", "metal", 7, 16, "Kết quả hợp tác khoa học quốc tế, giúp các nhà hóa học tìm hiểu tính chất của các nguyên tố siêu nặng cuối chu kỳ 7."],
+            [117, "Ts", "Tennessine", "294", "[Rn] 5f¹⁴ 6d¹⁰ 7s² 7p⁵", "17 (VIIA)", 7, "Không xác định", "176 pm", "nonmetal", 7, 17, "Nguyên tố được phát hiện gần đây nhất (năm 2010), hoàn thiện hàng cuối cùng của nhóm Halogen."],
+            [118, "Og", "Oganesson", "294", "[Rn] 5f¹⁴ 6d¹⁰ 7s² 7p⁶", "18 (VIIIA)", 7, "Không xác định", "152 pm", "noble", 7, 18, "Nguyên tố nặng nhất trong bảng tuần hoàn hiện nay (số hiệu 118), khép lại chu kỳ 7 đầy kỳ diệu của hóa học."]
+        ];
+
+        // Bản đồ tên tiếng Việt cho 6 phân loại màu sắc
+        const CATEGORY_INFO = {
+            metal: {
+                label: "Kim loại",
+                class: "type-metal",
+                headerBg: "bg-[#FFD6E0] border-[#FF8FAB] text-[#800F2F]",
+                cardBorder: "border-[#FF8FAB]"
+            },
+            transition: {
+                label: "Kim loại chuyển tiếp",
+                class: "type-transition",
+                headerBg: "bg-[#FFE8CC] border-[#FFB703] text-[#7F4F24]",
+                cardBorder: "border-[#FFB703]"
+            },
+            nonmetal: {
+                label: "Phi kim",
+                class: "type-nonmetal",
+                headerBg: "bg-[#D8F3DC] border-[#52B788] text-[#1B4332]",
+                cardBorder: "border-[#52B788]"
+            },
+            noble: {
+                label: "Khí hiếm",
+                class: "type-noble",
+                headerBg: "bg-[#D0EBFF] border-[#4CC9F0] text-[#023E8A]",
+                cardBorder: "border-[#4CC9F0]"
+            },
+            lanthanide: {
+                label: "Họ Lanthan",
+                class: "type-lanthanide",
+                headerBg: "bg-[#E5D4EF] border-[#B5179E] text-[#4A148C]",
+                cardBorder: "border-[#B5179E]"
+            },
+            actinide: {
+                label: "Họ Actin",
+                class: "type-actinide",
+                headerBg: "bg-[#FFF3B0] border-[#E09F3E] text-[#540B0E]",
+                cardBorder: "border-[#E09F3E]"
+            }
+        };
+
+        // Chuyển đổi mảng raw sang object có cấu trúc rõ ràng
+        const elements = ELEMENTS_RAW.map(item => ({
+            z: item[0],
+            symbol: item[1],
+            name: item[2],
+            mass: item[3],
+            config: item[4],
+            group: item[5],
+            period: item[6],
+            electronegativity: item[7],
+            radius: item[8],
+            category: item[9],
+            row: item[10],
+            col: item[11],
+            usage: item[12]
+        }));
+
+        /**
+         * =========================================================================
+         * BỘ TẠO ÂM THANH VUI NHỘN BẰNG WEB AUDIO API (KHÔNG CẦN FILE NGOÀI)
+         * =========================================================================
+         */
+        let soundEnabled = true;
+        let audioCtx = null;
+
+        function initAudio() {
+            if (!audioCtx) {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                if (AudioContext) audioCtx = new AudioContext();
+            }
+            if (audioCtx && audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+
+        function playPopSound(freq = 520) {
+            if (!soundEnabled) return;
+            try {
+                initAudio();
+                if (!audioCtx) return;
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(freq * 1.45, audioCtx.currentTime + 0.09);
+
+                gain.gain.setValueAtTime(0.14, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.11);
+
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.12);
+            } catch (e) {
+                // Bỏ qua nếu trình duyệt chặn autoplay audio
+            }
+        }
+
+        function playSuccessChord() {
+            if (!soundEnabled) return;
+            [523.25, 659.25, 783.99, 1046.5].forEach((note, idx) => {
+                setTimeout(() => playPopSound(note), idx * 65);
+            });
+        }
+
+        /**
+         * =========================================================================
+         * TẠO BONG BÓNG BAY NỀN DỄ THƯƠNG
+         * =========================================================================
+         */
+        function createBackgroundBubbles() {
+            const container = document.getElementById('bubbles-container');
+            const colors = [
+                'rgba(255, 182, 193, 0.35)',
+                'rgba(173, 216, 230, 0.35)',
+                'rgba(216, 243, 220, 0.45)',
+                'rgba(229, 212, 239, 0.35)',
+                'rgba(255, 243, 176, 0.4)'
+            ];
+            for (let i = 0; i < 16; i++) {
+                const bubble = document.createElement('div');
+                bubble.className = 'bubble';
+                const size = Math.floor(Math.random() * 45) + 18;
+                bubble.style.width = `${size}px`;
+                bubble.style.height = `${size}px`;
+                bubble.style.left = `${Math.random() * 100}vw`;
+                bubble.style.animationDuration = `${Math.random() * 12 + 10}s`;
+                bubble.style.animationDelay = `${Math.random() * 10}s`;
+                bubble.style.background = `radial-gradient(circle at 30% 30%, rgba(255,255,255,0.95), ${colors[i % colors.length]})`;
+                container.appendChild(bubble);
+            }
+        }
+
+        /**
+         * =========================================================================
+         * RENDER BẢNG TUẦN HOÀN 118 Ô (CHỈ HIỂN THỊ SỐ HIỆU NGUYÊN TỬ TRONG Ô)
+         * =========================================================================
+         */
+        let currentFilter = 'all';
+        let currentModalZ = 7;
+
+        function renderPeriodicTable() {
+            const grid = document.getElementById('periodic-table');
+            grid.innerHTML = '';
+
+            // Render 118 ô nguyên tố
+            elements.forEach(el => {
+                const cell = document.createElement('button');
+                const catInfo = CATEGORY_INFO[el.category];
+                cell.type = 'button';
+                cell.className = `el-cell ${catInfo.class}`;
+                cell.style.gridRow = el.row;
+                cell.style.gridColumn = el.col;
+                cell.dataset.z = el.z;
+                cell.dataset.category = el.category;
+                cell.setAttribute('aria-label', `Nguyên tố số ${el.z}`);
+
+                // LƯU Ý QUAN TRỌNG: Trong mỗi ô chỉ hiển thị duy nhất số hiệu nguyên tử
+                cell.textContent = el.z;
+
+                // Cập nhật lời thoại Mèo Mimi khi di chuột qua ô
+                cell.addEventListener('mouseenter', () => {
+                    document.getElementById('mascot-speech').innerHTML = 
+                        `Ô số <span class="text-pink-600 font-black">${el.z}</span> thuộc nhóm <span class="underline">${catInfo.label}</span>! Bấm vào để mở khóa bí mật nhé! 🐾`;
+                });
+
+                // Mở Modal chi tiết khi click
+                cell.addEventListener('click', () => {
+                    playPopSound(480 + (el.z % 24) * 18);
+                    openElementModal(el.z);
+                });
+
+                grid.appendChild(cell);
+            });
+
+            // Thêm 2 ô chỉ dẫn nhỏ xinh cho vị trí tách của họ Lanthan (57-71) và Actin (89-103)
+            const lanPlaceholder = document.createElement('div');
+            lanPlaceholder.style.gridRow = 6;
+            lanPlaceholder.style.gridColumn = 3;
+            lanPlaceholder.className = 'rounded-xl border-2 border-dashed border-[#B5179E]/50 bg-[#E5D4EF]/40 flex items-center justify-center text-[10px] font-black text-[#4A148C] select-none';
+            lanPlaceholder.textContent = '57-71';
+            grid.appendChild(lanPlaceholder);
+
+            const actPlaceholder = document.createElement('div');
+            actPlaceholder.style.gridRow = 7;
+            actPlaceholder.style.gridColumn = 3;
+            actPlaceholder.className = 'rounded-xl border-2 border-dashed border-[#E09F3E]/60 bg-[#FFF3B0]/50 flex items-center justify-center text-[10px] font-black text-[#540B0E] select-none';
+            actPlaceholder.textContent = '89-103';
+            grid.appendChild(actPlaceholder);
+
+            // Khoảng cách ngăn cách nhẹ giữa bảng chính (hàng 1-7) và 2 hàng họ Lanthan/Actin (hàng 9-10)
+            const spacer = document.createElement('div');
+            spacer.style.gridRow = 8;
+            spacer.style.gridColumn = '1 / span 18';
+            spacer.className = 'h-3';
+            grid.appendChild(spacer);
+        }
+
+        /**
+         * =========================================================================
+         * BỘ LỌC THEO 6 LOẠI & TÌM KIẾM NHANH
+         * =========================================================================
+         */
+        function applyFilterAndSearch() {
+            const query = document.getElementById('search-input').value.trim().toLowerCase();
+            const clearBtn = document.getElementById('clear-search-btn');
+            const resetFilterBtn = document.getElementById('reset-filter-btn');
+
+            clearBtn.classList.toggle('hidden', query.length === 0);
+            resetFilterBtn.classList.toggle('hidden', currentFilter === 'all');
+
+            const cells = document.querySelectorAll('.el-cell');
+            let matchCount = 0;
+
+            cells.forEach(cell => {
+                const z = parseInt(cell.dataset.z, 10);
+                const el = elements[z - 1];
+
+                const matchCat = (currentFilter === 'all' || el.category === currentFilter);
+                const matchQuery = !query || 
+                    el.z.toString() === query ||
+                    el.symbol.toLowerCase() === query ||
+                    el.name.toLowerCase().includes(query) ||
+                    el.z.toString().includes(query);
+
+                cell.classList.remove('el-dimmed', 'el-highlight');
+
+                if (matchCat && matchQuery) {
+                    matchCount++;
+                    if (query.length > 0) {
+                        cell.classList.add('el-highlight');
+                    }
+                } else {
+                    cell.classList.add('el-dimmed');
+                }
+            });
+
+            if (query.length > 0) {
+                document.getElementById('mascot-speech').innerHTML = matchCount > 0 
+                    ? `Meo! Mimi tìm thấy <span class="text-pink-600 font-black">${matchCount}</span> nguyên tố khớp với từ khóa "${query}" nè! 🔍`
+                    : `Huhu, không tìm thấy nguyên tố nào khớp với "${query}". Bạn thử nhập số hiệu (1-118) hoặc ký hiệu nhé! 😿`;
+            }
+        }
+
+        /**
+         * =========================================================================
+         * HIỂN THỊ MODAL CHI TIẾT NGUYÊN TỐ
+         * =========================================================================
+         */
+        function openElementModal(z) {
+            const el = elements[z - 1];
+            if (!el) return;
+            currentModalZ = z;
+
+            const catInfo = CATEGORY_INFO[el.category];
+            const modal = document.getElementById('element-modal');
+            const card = document.getElementById('modal-card');
+            const header = document.getElementById('modal-header');
+            const badge = document.getElementById('modal-badge');
+
+            // Đồng bộ màu sắc thẻ theo đúng 1 trong 6 loại
+            card.className = `modal-animate relative w-full max-w-2xl bg-white rounded-[2.2rem] shadow-2xl border-4 overflow-hidden max-h-[92vh] flex flex-col ${catInfo.cardBorder}`;
+            header.className = `p-5 sm:p-6 flex items-center justify-between gap-4 border-b-2 ${catInfo.headerBg}`;
+            badge.className = `w-20 h-20 sm:w-24 sm:h-24 rounded-3xl bg-white/95 shadow-inner flex flex-col items-center justify-center border-2 shrink-0 ${catInfo.cardBorder}`;
+
+            // Điền đầy đủ thông tin theo yêu cầu
+            document.getElementById('modal-atomic-num').textContent = el.z;
+            document.getElementById('modal-symbol').textContent = el.symbol;
+            document.getElementById('modal-mass-short').textContent = el.mass;
+            document.getElementById('modal-category-pill').textContent = catInfo.label;
+            document.getElementById('modal-name').textContent = el.name;
+
+            document.getElementById('detail-z').textContent = el.z;
+            document.getElementById('detail-mass').textContent = `${el.mass} u`;
+            document.getElementById('detail-group-period').textContent = `Nhóm ${el.group} • Chu kì ${el.period}`;
+            document.getElementById('detail-electronegativity').textContent = el.electronegativity;
+            document.getElementById('detail-radius').textContent = el.radius;
+            document.getElementById('detail-category').textContent = catInfo.label;
+            document.getElementById('detail-config').textContent = el.config;
+            document.getElementById('detail-usage').textContent = el.usage;
+
+            // Cập nhật trạng thái nút Trước / Sau
+            document.getElementById('prev-el-btn').disabled = (z <= 1);
+            document.getElementById('prev-el-btn').classList.toggle('opacity-40', z <= 1);
+            document.getElementById('next-el-btn').disabled = (z >= 118);
+            document.getElementById('next-el-btn').classList.toggle('opacity-40', z >= 118);
+
+            modal.classList.remove('hidden');
+        }
+
+        function closeElementModal() {
+            playPopSound(380);
+            document.getElementById('element-modal').classList.add('hidden');
+        }
+
+        /**
+         * =========================================================================
+         * KHỞI TẠO SỰ KIỆN KHI TẢI TRANG
+         * =========================================================================
+         */
+        window.addEventListener('DOMContentLoaded', () => {
+            createBackgroundBubbles();
+            renderPeriodicTable();
+
+            // Nút PLAY trên màn hình chào
+            document.getElementById('play-btn').addEventListener('click', () => {
+                playSuccessChord();
+                document.getElementById('landing-screen').classList.add('hidden');
+                document.getElementById('app-screen').classList.remove('hidden');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+
+            // Nút quay lại màn hình chào
+            document.getElementById('back-home-btn').addEventListener('click', () => {
+                playPopSound(440);
+                document.getElementById('app-screen').classList.add('hidden');
+                document.getElementById('landing-screen').classList.remove('hidden');
+            });
+
+            // Bật / tắt âm thanh
+            const toggleSound = () => {
+                soundEnabled = !soundEnabled;
+                document.getElementById('sound-icon').textContent = soundEnabled ? '🔊' : '🔇';
+                document.getElementById('sound-toggle-mobile').textContent = soundEnabled ? '🔊' : '🔇';
+                if (soundEnabled) playPopSound(600);
+            };
+            document.getElementById('sound-toggle-desktop').addEventListener('click', toggleSound);
+            document.getElementById('sound-toggle-mobile').addEventListener('click', toggleSound);
+
+            // Sự kiện bộ lọc 6 màu
+            document.querySelectorAll('.legend-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    playPopSound(560);
+                    const selected = btn.dataset.filter;
+                    if (currentFilter === selected) {
+                        currentFilter = 'all';
+                    } else {
+                        currentFilter = selected;
+                    }
+
+                    // Đánh dấu nút đang chọn
+                    document.querySelectorAll('.legend-btn').forEach(b => {
+                        if (currentFilter !== 'all' && b.dataset.filter === currentFilter) {
+                            b.classList.add('ring-4', 'ring-pink-300', 'scale-105');
+                        } else {
+                            b.classList.remove('ring-4', 'ring-pink-300', 'scale-105');
+                        }
+                    });
+
+                    applyFilterAndSearch();
+                });
+            });
+
+            document.getElementById('reset-filter-btn').addEventListener('click', () => {
+                playPopSound(500);
+                currentFilter = 'all';
+                document.querySelectorAll('.legend-btn').forEach(b => {
+                    b.classList.remove('ring-4', 'ring-pink-300', 'scale-105');
+                });
+                applyFilterAndSearch();
+            });
+
+            // Sự kiện thanh tìm kiếm
+            const searchInput = document.getElementById('search-input');
+            searchInput.addEventListener('input', applyFilterAndSearch);
+            document.getElementById('clear-search-btn').addEventListener('click', () => {
+                searchInput.value = '';
+                applyFilterAndSearch();
+                searchInput.focus();
+            });
+
+            // Sự kiện đóng Modal & chuyển nguyên tố trước/sau
+            document.getElementById('close-modal-btn').addEventListener('click', closeElementModal);
+            document.getElementById('element-modal').addEventListener('click', (e) => {
+                if (e.target.id === 'element-modal') closeElementModal();
+            });
+            document.addEventListener('keydown', (e) => {
+                const modalOpen = !document.getElementById('element-modal').classList.contains('hidden');
+                if (!modalOpen) return;
+                if (e.key === 'Escape') closeElementModal();
+                if (e.key === 'ArrowLeft' && currentModalZ > 1) {
+                    playPopSound(500);
+                    openElementModal(currentModalZ - 1);
+                }
+                if (e.key === 'ArrowRight' && currentModalZ < 118) {
+                    playPopSound(540);
+                    openElementModal(currentModalZ + 1);
+                }
+            });
+
+            document.getElementById('prev-el-btn').addEventListener('click', () => {
+                if (currentModalZ > 1) {
+                    playPopSound(500);
+                    openElementModal(currentModalZ - 1);
+                }
+            });
+            document.getElementById('next-el-btn').addEventListener('click', () => {
+                if (currentModalZ < 118) {
+                    playPopSound(540);
+                    openElementModal(currentModalZ + 1);
+                }
+            });
+        });
+    </script>
+</body>
+</html>
